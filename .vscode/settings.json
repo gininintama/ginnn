@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "iosfwd": "cpp",
+        "streambuf": "c"
+    },
+    "python.pythonPath": "/usr/bin/python3"
+}
