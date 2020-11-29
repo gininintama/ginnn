@@ -46,6 +46,7 @@ statement
     | if_else {$$=$1;}
     | while {$$=$1;}
     | BLP statements BRP {$$=$2;}
+    | assign {$$=$1;}
     ;
 if_else
     : IF bool_statment statement %prec LOWER_THEN_ELSE {
@@ -143,6 +144,15 @@ bool_expr
         $$=node;        
     }
     ;
+assign 
+:   IDENTIFIER ASSIGN expr SEMICOLON{
+        TreeNode* node = new TreeNode($1->lineno, NODE_STMT);
+        node->stype = STMT_ASSIGN;
+        node->addChild($1);
+        node->addChild($3);
+        $$ = node;
+}
+;
 /*表达式*/
 expr
 : IDENTIFIER {
@@ -235,7 +245,6 @@ expr
     $$=node;   
 }
 ;
-
 T: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT;} 
 | T_CHAR {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CHAR;}
 | T_STRING {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_STRING;}

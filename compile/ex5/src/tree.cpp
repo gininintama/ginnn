@@ -156,8 +156,11 @@ string TreeNode::sType2String(StmtType type) {
         case STMT_PRINTF:
             return"printf";
             break;
-         case STMT_SCANF:
+        case STMT_SCANF:
             return"sacnf";
+            break;
+        case STMT_ASSIGN:
+            return"assign";
             break;
         default:
             return"?";

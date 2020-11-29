@@ -41,6 +41,7 @@ enum StmtType {
     STMT_WHILE,
     STMT_PRINTF,
     STMT_SCANF,
+    STMT_ASSIGN,
 }
 ;
 
