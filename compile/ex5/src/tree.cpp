@@ -30,58 +30,67 @@ TreeNode::TreeNode(int lino, NodeType type) {
 }
 
 void TreeNode::genNodeId() {
-    if(this==nullptr)
-        return;
-    this->nodeID=NodeIndex++;
-    this->child->genNodeId();
-    this->sibling->genNodeId();
+    TreeNode* node= this;
+    if(node!=nullptr){
+        node->nodeID=NodeIndex++;
+        node->child->genNodeId();
+        node->sibling->genNodeId();
+    }
+    else return;
 }
 
 void TreeNode::printNodeInfo() {
-    if(this==nullptr)
-        return;
-    //NODE_PROG NODE_STMT NODE_EXPR
-    cout<<"lno@"<<this->lineno<<"   "<<"@"<this->nodeID<<" "<<this->nodeType2String(this->nodeType);
-    if(this->nodeType==NODE_VAR)
+    TreeNode* node= this;
+    if(node!=nullptr)
     {
-        cout<<" varname: "<<this->var_name;
-        return;
+        //NODE_PROG NODE_STMT NODE_EXPR
+        cout<<"lno@"<<node->lineno<<"   "<<"@"<<node->nodeID<<" "<<node->nodeType2String(node->nodeType);
+        if(node->nodeType==NODE_VAR)
+        {
+            cout<<" varname: "<<node->var_name;
+            return;
+        }
+        if(node->nodeType==NODE_CONST)
+        {
+            if(node->type->type==VALUE_INT)
+                cout<<" type: "<<node->int_val;
+            else if(node->type->type==VALUE_CHAR)
+                cout<<" type: "<<node->ch_val;
+            else if(node->type->type==VALUE_STRING)
+                cout<<" type: "<<node->str_val;
+            else
+                cout<<" type: "<<node->b_val;
+            return;
+        }
+        if(node->nodeType==NODE_TYPE)
+        {
+            if(node->type->type==VALUE_INT)
+                cout<<" type: int";
+            else if(node->type->type==VALUE_CHAR)
+                cout<<" type: char";
+            else if(node->type->type==VALUE_STRING)
+                cout<<" type: string";
+            else
+                cout<<" type: bool";
+            return;
+        }
     }
-    if(this->nodeType==NODE_CONST)
-    {
-        if(this->type==TYPE_INT)
-            cout<<" type: "<<this->int_val;
-        else if(this->type==TYPE_CHAR)
-            cout<<" type: "<<this->ch_val;
-        else
-            cout<<" type: "<<this->str_val;
-        return;
-    }
-    if(this->nodeType==NODE_TYPE)
-    {
-        if(this->type==TYPE_INT)
-            cout<<" type: "<<this->int_val;
-        else if(this->type==TYPE_CHAR)
-            cout<<" type: "<<this->ch_val;
-        else
-            cout<<" type: "<<this->str_val;
-        return;
-    }
+    else return;
 }  
 
 void TreeNode::printChildrenId() {
     if (this->child == nullptr)
         return;
     cout << " children: [";
-    cout << this->child->nodeID << " ";
+    cout <<"@"<< this->child->nodeID << " ";
     if (this->child->sibling == nullptr)
         return;
     else {
-        cout << this->child->sibling->nodeID << " ";
+        cout <<"@"<< this->child->sibling->nodeID << " ";
         TreeNode* temp = this->child->sibling->sibling;
         while (temp != nullptr)
         {
-            cout << temp->nodeID << " ";
+            cout <<"@"<< temp->nodeID << " ";
                 temp = temp->sibling;
         }
     }
@@ -91,23 +100,22 @@ void TreeNode::printChildrenId() {
         cout<<" stmt: "<<this->sType2String(this->stype)<<endl;
         return;
     }
-    if(this->nodeType==NODE_EXPR)
-    {
-        cout<<" expression: "<<this->opType2String(this->optype)<<endl;
-        return;
-    }
+    
     cout<<endl;
 }
 
 void TreeNode::printAST() {//先序遍历
-    if(this==nullptr)
+    TreeNode* node= this;
+    if(node!=nullptr)
     {
-        return;
+        node->printNodeInfo();
+        if(node->nodeType!=NODE_VAR&&node->nodeType!=NODE_CONST&&node->nodeType!=NODE_TYPE)
+            node->printChildrenId();
+        else cout<<endl;
+        node->child->printAST();
+        node->sibling->printAST();
     }
-    this->printNodeInfo();
-    this->printChildrenId();
-    this->child->printAST();
-    this->sibling->printAST();
+    else return;
 }
 
 
@@ -134,24 +142,25 @@ void TreeNode::printSpecialInfo() {
 string TreeNode::sType2String(StmtType type) {
    switch(type){
         case STMT_SKIP:
-            printf("skip");
+            return"skip";
             break;
         case STMT_DECL:
-            printf("decl");
+            return"decl";
             break;
         case STMT_IF:
-            printf("if");
+            return"if";
             break;
         case STMT_WHILE:
-            printf("while");
+            return"while";
             break;
         case STMT_PRINTF:
-            printf("printf");
+            return"printf";
             break;
          case STMT_SCANF:
-            printf("sacnf");
+            return"sacnf";
             break;
         default:
+            return"?";
             break;
     }
 }
@@ -160,24 +169,25 @@ string TreeNode::sType2String(StmtType type) {
 string TreeNode::nodeType2String (NodeType type){
     switch(type){
         case NODE_CONST:
-            printf("const");
+            return"const";
             break;
         case NODE_VAR:
-            printf("variable");
+            return"variable";
             break;
         case NODE_EXPR:
-            printf("expression");
+            return"expression";
             break;
         case NODE_TYPE:
-            printf("type");
+            return"type";
             break;
         case NODE_STMT:
-            printf("statement");
+            return"statement";
             break;
         case NODE_PROG:
-            printf("program");
+            return"program";
             break;
         default:
+            return"<>";
             break;
     }
 }
@@ -185,45 +195,46 @@ string TreeNode::nodeType2String (NodeType type){
 string opType2String (OperatorType type){
     switch(type){
         case OP_EQ:
-            printf("EQ");
+            return"EQ";
             break;
         case OP_NOT:
-            printf("NOT");
+            return"NOT";
             break;
         case OP_OR:
-            printf("OR");
+            return"OR";
             break;
         case OP_AND:
-            printf("AND");
+            return"AND";
             break;
         case OP_NE:
-            printf("NE");
+            return"NE";
             break;
         case OP_SE:
-            printf("SE");
+            return"SE";
             break;
         case OP_BE:
-            printf("BE");
+            return"BE";
             break;
         case OP_BT:
-            printf("BT");
+            return"BT";
             break;
         case OP_PLUS:
-            printf("PLUS");
+            return"PLUS";
             break;
         case OP_MINUS:
-            printf("MINUS");
+            return"MINUS";
             break;
         case OP_MUL:
-            printf("MUL");
+            return"MUL";
             break;
         case OP_DIV:
-            printf("DIV");
+            return"DIV";
             break;
         case OP_MOD:
-            printf("MOD");
+            return"MOD";
             break;
         default:
+            return"!";
             break;
     }
 }

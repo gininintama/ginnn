@@ -6,8 +6,6 @@ Type::Type(ValueType valueType) {
 
 string Type::getTypeInfo() {
     switch(this->type) {
-        case VALUE_BOOL:
-            return "bool";
         case VALUE_INT:
             return "int";
         case VALUE_CHAR:

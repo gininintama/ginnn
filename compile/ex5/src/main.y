@@ -1,30 +1,31 @@
 %{
     #include "common.h"
-    #define YYSTYPE TreeNode *  
+    #define YYstype TreeNode *  
     TreeNode* root;
     extern int lineno;
     int yylex();
     int yyerror( char const * );
 %}
 /*变量声明*/
-%token T_CHAR T_INT T_STRING
+%token T_CHAR T_INT T_STRING T_BOOL
 /*语句*/
 %token ASSIGN
 %token IF ELSE WHILE FOR RETURN
 %token BLP BRP LP RP SEMICOLON
 %token TRUE FALSE
 /*数据类型*/
-%token IDENTIFIER INTEGER CHAR STRING
+%token IDENTIFIER INTEGER CHAR STRING BOOL
+%token PRINTF SCANF
 /*表达式*/
+%left ASSIGN
 %left OR
 %left AND
 %left NE
 %left EQ
-%left SE,ST,BE,BT
-%left PLUS,MINUS
-%left MUL,DIV,MOD
+%left SE ST BE BT
+%left PLUS MINUS
+%left MUL DIV MOD
 %right NOT
-%right UMINUS
 %nonassoc LOWER_THEN_ELSE
 %nonassoc ELSE 
 %%
@@ -49,14 +50,14 @@ statement
 if_else
     : IF bool_statment statement %prec LOWER_THEN_ELSE {
         TreeNode *node=new TreeNode($1->lineno,NODE_STMT);
-        node->stmtType=STMT_IF;
+        node->stype=STMT_IF;
         node->addChild($2);
         node->addChild($3);
         $$=node;
     }
     | IF bool_statment statement ELSE statement {
         TreeNode *node=new TreeNode($1->lineno,NODE_STMT);
-        node->stmtType=STMT_IF;
+        node->stype=STMT_IF;
         node->addChild($2);
         node->addChild($3);
         node->addChild($5);
@@ -66,7 +67,7 @@ if_else
 while
     : WHILE bool_statment statement {
         TreeNode *node=new TreeNode($1->lineno,NODE_STMT);
-        node->stmtType=STMT_WHILE;
+        node->stype=STMT_WHILE;
         node->addChild($2);
         node->addChild($3);
         $$=node;
@@ -98,7 +99,7 @@ declaration
 printf
     : PRINTF LP expr RP {
         TreeNode *node=new TreeNode($1->lineno,NODE_STMT);
-        node->stmtType=STMT_PRINTF;
+        node->stype=STMT_PRINTF;
         node->addChild($3);
         $$=node;
     }
@@ -106,7 +107,7 @@ printf
 scanf
     : SCANF LP expr RP {
         TreeNode *node=new TreeNode($1->lineno,NODE_STMT);
-        node->stmtType=STMT_SCANF;
+        node->stype=STMT_SCANF;
         node->addChild($3);
         $$=node;
     }
@@ -115,29 +116,29 @@ bool_expr
     : TRUE {$$=$1;}
     | FALSE {$$=$1;}
     | expr EQ expr {
-        TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-        node->opType=OP_EQ;
+        TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+        node->optype=OP_EQ;
         node->addChild($1);
         node->addChild($3);
         $$=node;
     }
     | expr AND expr {
-        TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-        node->opType=OP_EQ;
+        TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+        node->optype=OP_EQ;
         node->addChild($1);
         node->addChild($3);
         $$=node;
     }
     | expr OR expr {
-        TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-        node->opType=OP_EQ;
+        TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+        node->optype=OP_EQ;
         node->addChild($1);
         node->addChild($3);
         $$=node;
     }
     | NOT bool_expr {
-        TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-        node->opType=OP_NOT;
+        TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+        node->optype=OP_NOT;
         node->addChild($2);
         $$=node;        
     }
@@ -157,78 +158,78 @@ expr
     $$ = $1;
 }
 | expr PLUS expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_PLUS;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_PLUS;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr MINUS expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_MINUS;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_MINUS;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr MUL expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_MUL;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_MUL;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr DIV expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_DIV;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_DIV;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr MOD expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_MOD;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_MOD;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr NE expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_NE;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_NE;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr EQ expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_EQ;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_EQ;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr SE expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_SE;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_SE;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr ST expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_ST;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_ST;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr BE expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_BE;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_BE;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
 }
 | expr BT expr {
-    TreeNode *node=new TreeNode($1->lineno,NODE_OP);
-    node->opType=OP_BT;
+    TreeNode *node=new TreeNode($1->lineno,NODE_EXPR);
+    node->optype=OP_BT;
     node->addChild($1);
     node->addChild($3);
     $$=node;   
@@ -238,6 +239,7 @@ expr
 T: T_INT {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_INT;} 
 | T_CHAR {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_CHAR;}
 | T_STRING {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_STRING;}
+| T_BOOL {$$ = new TreeNode(lineno, NODE_TYPE); $$->type = TYPE_BOOL;}
 ;
 
 %%
