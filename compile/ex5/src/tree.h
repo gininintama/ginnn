@@ -70,6 +70,7 @@ public:
     StmtType stype;
     int int_val;
     char ch_val;
+    bool b_val;
     string str_val;
     string var_name;
 public:

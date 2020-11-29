@@ -8,6 +8,7 @@ enum ValueType
     VALUE_INT,
     VALUE_CHAR,
     VALUE_STRING,
+    VALUE_BOOL,
     COMPOSE_STRUCT,
     COMPOSE_UNION,
     COMPOSE_FUNCTION
@@ -36,7 +37,7 @@ public:
 static Type* TYPE_INT = new Type(VALUE_INT);
 static Type* TYPE_CHAR = new Type(VALUE_CHAR);
 static Type* TYPE_STRING = new Type(VALUE_STRING);
-
+static Type* TYPE_BOOL = new Type(VALUE_STRING);
 int getSize(Type* type);
 
 #endif

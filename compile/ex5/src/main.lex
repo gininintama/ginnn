@@ -4,21 +4,28 @@
 #include "main.tab.h"  // yacc header
 int lineno=1;
 %}
+BLOCKCOMMENT \/\*([^\*^\/]*|[\*^\/*]*|[^\**\/]*)*\*\/
+LINECOMMENT \/\/[^\n]*
 EOL	(\r\n|\r|\n)
 WHILTESPACE [[:blank:]]
 
-/*数据类型*/
 INTEGER [0-9]+
 CHAR \'.?\'
 STRING \".+\"
 IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
+BOOL [0|1]
+
 %%
 
-/*变量声明*/
-"int" return INT;
-"char" return CHAR;
-"string" return STRING;
-/*语句*/
+{BLOCKCOMMENT}  /* do nothing */
+{LINECOMMENT}  /* do nothing */
+
+
+"int" return T_INT;
+"char" return T_CHAR;
+"string" return T_STRING;
+"bool"  return T_BOOL;
+
 "return" return RETURN;
 "while" return WHILE;
 "if" return IF;
@@ -28,7 +35,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 ";" return  SEMICOLON;
 "printf" return PRINTF;
 "scanf" return SCANF;
-/*表达式*/
+
 "+" return PLUS;
 "-" return MINUS;
 "*" return MUL;
@@ -77,6 +84,15 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     yylval = node;
     return IDENTIFIER;
 }
+{BOOL} {
+    TreeNode* node = new TreeNode(lineno, NODE_CONST);
+    node->type = TYPE_BOOL;    
+    node->b_val = bool(atoi(yytext));
+    yylval = node;
+    return BOOL;
+}
+
+{WHILTESPACE} /* do nothing */
 
 {EOL} lineno++;
 
