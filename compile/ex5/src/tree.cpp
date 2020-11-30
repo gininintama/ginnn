@@ -83,8 +83,7 @@ void TreeNode::printChildrenId() {
         return;
     cout << " children: [";
     cout <<"@"<< this->child->nodeID << " ";
-    if (this->child->sibling == nullptr)
-        return;
+    if (this->child->sibling == nullptr);
     else {
         cout <<"@"<< this->child->sibling->nodeID << " ";
         TreeNode* temp = this->child->sibling->sibling;
@@ -100,7 +99,11 @@ void TreeNode::printChildrenId() {
         cout<<" stmt: "<<this->sType2String(this->stype)<<endl;
         return;
     }
-    
+    if(this->nodeType==NODE_EXPR)
+    {
+        cout<<" expr: "<<this->opType2String(this->optype)<<endl;
+        return;
+    }
     cout<<endl;
 }
 
@@ -157,7 +160,7 @@ string TreeNode::sType2String(StmtType type) {
             return"printf";
             break;
         case STMT_SCANF:
-            return"sacnf";
+            return"scanf";
             break;
         case STMT_ASSIGN:
             return"assign";
@@ -195,49 +198,52 @@ string TreeNode::nodeType2String (NodeType type){
     }
 }
 
-string opType2String (OperatorType type){
+string TreeNode::opType2String (OperatorType type){
     switch(type){
         case OP_EQ:
-            return"EQ";
+            return"==";
             break;
         case OP_NOT:
-            return"NOT";
+            return"!";
             break;
         case OP_OR:
-            return"OR";
+            return"||";
             break;
         case OP_AND:
-            return"AND";
+            return"&&";
             break;
         case OP_NE:
-            return"NE";
+            return"!=";
             break;
         case OP_SE:
-            return"SE";
+            return"<=";
             break;
         case OP_BE:
-            return"BE";
+            return">=";
             break;
         case OP_BT:
-            return"BT";
+            return">";
+            break;
+        case OP_ST:
+            return"<";
             break;
         case OP_PLUS:
-            return"PLUS";
+            return"+";
             break;
         case OP_MINUS:
-            return"MINUS";
+            return"-";
             break;
         case OP_MUL:
-            return"MUL";
+            return"*";
             break;
         case OP_DIV:
-            return"DIV";
+            return"/";
             break;
         case OP_MOD:
-            return"MOD";
+            return"%";
             break;
         default:
-            return"!";
+            return"!!!";
             break;
     }
 }
